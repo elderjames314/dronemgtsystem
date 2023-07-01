@@ -46,7 +46,8 @@ public class Drone {
     private double weightLimit;
 
     @NotNull
-    private int batteryCapacity;
+    @Size(max=100)
+    private int batteryCapacity = 100;
 
     @NotNull
     @Enumerated(EnumType.STRING)
