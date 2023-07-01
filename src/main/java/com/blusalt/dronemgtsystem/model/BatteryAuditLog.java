@@ -5,39 +5,35 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.blusalt.dronemgtsystem.enums.AuditAction;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
-@Entity(name = "delivery_audits")
-public class DeliveryAudit {
+@Entity
+@Table(name = "battery_audit_logs")
+public class BatteryAuditLog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "action")
-    private AuditAction action;
+    @Column(name = "drone_serial_number")
+    private String droneSerialNumber;
 
-    @Column(name = "remark")
-    private String remark;
+    @Column(name = "battery_details")
+    private String batteryDetails;
 
-    @ManyToOne
-    @JoinColumn(name = "delivery_id")
-    private Delivery delivery;
+    private String message;
+
+    @Column(name = "battery_capacity")
+    private String batteryCapacity;
 
     @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -46,4 +42,5 @@ public class DeliveryAudit {
     @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+    
 }
