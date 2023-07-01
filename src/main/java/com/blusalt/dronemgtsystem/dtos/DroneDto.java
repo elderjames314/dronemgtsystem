@@ -15,34 +15,52 @@ import lombok.NoArgsConstructor;
 public class DroneDto {
     private String serialNumber;
     private String model;
-    private String weight;
+    private String weightLimit;
     private int batteryCapacity;
 
     public static DroneDto developDroneModel(DroneDto droneDto) {
-        DroneDtoBuilder builder = DroneDto.builder();
+        validateDroneModel(droneDto.getModel());
+        validateSerialNumber(droneDto.getSerialNumber());
+        validateWeightLimit(droneDto.getWeightLimit());
+        validateBatteryCapacity(droneDto.getBatteryCapacity());
 
-        // Validate and set the serial number
-        String serialNumber = droneDto.getSerialNumber();
+        return droneDto;
+    }
+
+    public DroneModel getModelPassed(String model) {
+        return DroneModel.valueOf(model);
+    }
+
+    private static void validateDroneModel(String string) {
+        if (string == null) {
+            throw new InvalidRequestException("Please specify the drone model");
+        }
+    }
+
+    private static void validateSerialNumber(String serialNumber) {
         if (isEmpty(serialNumber)) {
             throw new InvalidRequestException("Serial number cannot be null or empty");
         }
-        builder.serialNumber(serialNumber);
+    }
 
-        // Validate and set the weight
-        String weight = droneDto.getWeight();
-        if (isEmpty(weight)) {
-            throw new InvalidRequestException("Weight cannot be empty");
+    private static void validateWeightLimit(String weightLimit) {
+        if (isEmpty(weightLimit)) {
+            throw new InvalidRequestException("Weight limit cannot be null or empty");
         }
-        builder.weight(weight);// optional, if not specified, it will default to 
+        try {
+            double weight = Double.parseDouble(weightLimit);
+            if (weight > 100) {
+                throw new InvalidRequestException("Weight limit cannot exceed 100");
+            }
+        } catch (NumberFormatException e) {
+            throw new InvalidRequestException("Please specify the correct weight limit as a numeric value");
+        }
+    }
 
-        // Validate and set the battery capacity
-        int batteryCapacity = droneDto.getBatteryCapacity();
+    private static void validateBatteryCapacity(int batteryCapacity) {
         if (batteryCapacity <= 0) {
             throw new InvalidRequestException("Battery capacity must be greater than 0");
         }
-        builder.batteryCapacity(batteryCapacity);
-
-        return builder.build();
     }
 
     private static boolean isEmpty(String value) {

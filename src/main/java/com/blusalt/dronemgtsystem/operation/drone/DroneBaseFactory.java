@@ -6,7 +6,7 @@ import com.blusalt.dronemgtsystem.model.Drone;
 
 public abstract class DroneBaseFactory implements DroneFactory {
 
-    protected Drone createDrone(DroneDto droneDto, DroneModel droneModel) {
+    public Drone createDrone(DroneDto droneDto, DroneModel droneModel) {
         DroneDto developedDroneModel = DroneDto.developDroneModel(droneDto);
         Drone drone = new Drone();
         drone.setBatteryCapacity(developedDroneModel.getBatteryCapacity());
