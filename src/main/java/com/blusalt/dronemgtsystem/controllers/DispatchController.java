@@ -6,6 +6,7 @@ import com.blusalt.dronemgtsystem.enums.DroneModel;
 import com.blusalt.dronemgtsystem.exceptions.InvalidRequestException;
 import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.operation.drone.DroneBaseFactory;
+import com.blusalt.dronemgtsystem.operation.drone.DroneFactory;
 import com.blusalt.dronemgtsystem.operation.drone.MiddleweightDroneFactory;
 import com.blusalt.dronemgtsystem.utils.DroneConstant;
 import com.blusalt.dronemgtsystem.utils.Response;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DispatchController {
 
-    private final DroneBaseFactory droneBaseFactory;
+    private final DroneFactory droneFactory;
 
     @PostMapping
     public ResponseEntity<Response<CreatedDrone>> registerDrone(@RequestBody DroneDto droneDto) {
@@ -40,7 +41,7 @@ public class DispatchController {
 
     private Drone createDroneFromDto(DroneDto droneDto) {
         DroneModel droneModel = droneDto.getModelPassed(droneDto.getModel());
-        return droneBaseFactory.createDrone(droneDto, droneModel);
+        return droneFactory.createDrone(droneDto, droneModel);
     }
 
     private CreatedDrone mapToCreatedDrone(Drone drone) {

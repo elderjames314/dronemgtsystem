@@ -7,7 +7,7 @@ import com.blusalt.dronemgtsystem.model.Drone;
 public class CruiserDroneFactory extends DroneBaseFactory {
 
     @Override
-    public Drone createDrone(DroneDto droneDto) {
+    public Drone createDrone(DroneDto droneDto, DroneModel droneModel) {
       return createDrone(droneDto, DroneModel.CRUISERWEIGHT);
     }
     

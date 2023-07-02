@@ -5,11 +5,9 @@ import com.blusalt.dronemgtsystem.enums.DroneModel;
 import com.blusalt.dronemgtsystem.model.Drone;
 
 public class MiddleweightDroneFactory extends DroneBaseFactory {
-
     @Override
-    public Drone createDrone(DroneDto droneDto) {
+    public Drone createDrone(DroneDto droneDto, DroneModel droneModel) {
         return createDrone(droneDto, DroneModel.MIDDLEWEIGHT);
     }
 
-  
 }
