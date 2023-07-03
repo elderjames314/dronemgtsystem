@@ -41,7 +41,7 @@ public class Drone {
     private DroneModel model;
 
     @NotNull
-    @Size(max=100)
+    @Size(max=500)
     @Column(name = "weight_limit")
     private double weightLimit;
 
@@ -64,4 +64,9 @@ public class Drone {
     @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+
+
+    public void setDroneSerialNumber(String droneSerialNumber) {
+
+    }
 }

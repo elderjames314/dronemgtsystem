@@ -31,15 +31,23 @@ public class DroneDto {
         return DroneModel.valueOf(model);
     }
 
-    private static void validateDroneModel(String string) {
-        if (string == null) {
+    private static void validateDroneModel(String model) {
+        if (model == null) {
             throw new InvalidRequestException("Please specify the drone model");
+        }
+        try {
+            DroneModel.valueOf(model.toUpperCase());
+        } catch (IllegalArgumentException e) {
+           throw new InvalidRequestException("Please specify the correct model eg: Lightweight, Cruiserweight, Heavyweight or MiddleWeight");
         }
     }
 
     private static void validateSerialNumber(String serialNumber) {
         if (isEmpty(serialNumber)) {
             throw new InvalidRequestException("Serial number cannot be null or empty");
+        }
+        if(serialNumber.length() > 100) {
+            throw new InvalidRequestException("Serial number can only 100 max chars");
         }
     }
 
@@ -49,7 +57,7 @@ public class DroneDto {
         }
         try {
             double weight = Double.parseDouble(weightLimit);
-            if (weight > 100) {
+            if (weight > 500) {
                 throw new InvalidRequestException("Weight limit cannot exceed 100");
             }
         } catch (NumberFormatException e) {

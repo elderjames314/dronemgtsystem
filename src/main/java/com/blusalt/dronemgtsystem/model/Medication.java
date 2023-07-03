@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.blusalt.dronemgtsystem.exceptions.InvalidRequestException;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -37,4 +38,22 @@ public class Medication {
     @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+
+
+    public void setName(String name) {
+        if (name.matches("^[a-zA-Z0-9\\-_]+$")) {
+            this.name = name;
+        } else {
+            throw new InvalidRequestException("Invalid name. Only letters, numbers, '-', and '_' are allowed.");
+        }
+    }
+
+    public void setCode(String code) {
+        if (code.matches("^[A-Z_0-9]+$")) {
+            this.code = code;
+        } else {
+            throw new InvalidRequestException("Invalid code. Only uppercase letters, underscore, and numbers are allowed.");
+        }
+    }
+
 }
