@@ -2,21 +2,21 @@ package com.blusalt.dronemgtsystem.operation.dronestate;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.blusalt.dronemgtsystem.model.BatteryAuditLog;
 import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.repository.BatteryAuditLogRepository;
 import com.blusalt.dronemgtsystem.repository.DroneRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Component
 public class BatteryLevelAuditLogger {
-    @Autowired
-    private DroneRepository droneRepository;
+    
+    private final DroneRepository droneRepository;
+    private final BatteryAuditLogRepository BatteryAuditRepository;
 
-    @Autowired
-    private BatteryAuditLogRepository BatteryAuditRepository;
 
      public void createBatteryLevelAuditLog(Long droneId, int batteryLevel) {
         // update battery level

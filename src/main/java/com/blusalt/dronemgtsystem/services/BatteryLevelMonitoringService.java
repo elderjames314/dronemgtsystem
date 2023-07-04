@@ -1,4 +1,4 @@
-package com.blusalt.dronemgtsystem.config;
+package com.blusalt.dronemgtsystem.services;
 
 import org.springframework.stereotype.Service;
 

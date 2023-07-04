@@ -89,7 +89,7 @@ public class DroneDtoTest {
         DroneDto droneDto = DroneDto.builder()
                 .serialNumber("12345")
                 .model("HEAVYWEIGHT")
-                .weightLimit("150")
+                .weightLimit("1500")
                 .batteryCapacity(5000)
                 .build();
 

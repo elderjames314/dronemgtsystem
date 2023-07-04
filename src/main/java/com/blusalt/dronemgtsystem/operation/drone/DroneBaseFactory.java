@@ -3,7 +3,9 @@ package com.blusalt.dronemgtsystem.operation.drone;
 import com.blusalt.dronemgtsystem.dtos.DroneDto;
 import com.blusalt.dronemgtsystem.enums.DroneModel;
 import com.blusalt.dronemgtsystem.model.Drone;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DroneBaseFactory implements DroneFactory {
 
     public Drone createDrone(DroneDto droneDto, DroneModel droneModel) {

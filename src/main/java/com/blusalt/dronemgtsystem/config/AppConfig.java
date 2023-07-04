@@ -11,6 +11,7 @@ import com.blusalt.dronemgtsystem.operation.dronestate.BatteryLevelAuditLogger;
 import com.blusalt.dronemgtsystem.operation.dronestate.BatteryLevelMonitor;
 import com.blusalt.dronemgtsystem.repository.DroneRepository;
 
+
 @Configuration
 public class AppConfig {
 

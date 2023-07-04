@@ -5,11 +5,17 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
 import com.blusalt.dronemgtsystem.model.Medication;
+import com.blusalt.dronemgtsystem.repository.BatteryAuditLogRepository;
+import com.blusalt.dronemgtsystem.repository.DroneRepository;
 
+@Component
+@RequiredArgsConstructor
 public class DroneContext extends Observable {
     private DroneState currentState;
     private List<Medication> medications;
@@ -17,8 +23,6 @@ public class DroneContext extends Observable {
     private Long droneId;
     private List<Observer> observers;
 
-    @Autowired
-    private BatteryLevelAuditLogger batteryLevelAuditLogger;
 
     public DroneContext(Long droneId) {
         currentState = new IdleState();
@@ -29,6 +33,17 @@ public class DroneContext extends Observable {
         synchronized (this) {
             return new ArrayList<>(observers);
         }
+    }
+
+    public void updateBatteryLevel(int batteryLevel) {
+        setBatteryCapacity(batteryLevel);
+
+        // Notify the observers about the updated battery level
+        notifyObservers();
+    }
+
+    public void setDroneId(Long droneId) {
+        this.droneId = droneId;
     }
 
     public Long getDroneId() {
@@ -51,6 +66,7 @@ public class DroneContext extends Observable {
         observers.add(observer);
     }
 
+
     private void decreaseBatteryLevel() {
         // Assumption: I decrease the battery level by 10% upon each loading....
         double decreasePercentage = 0.10;
@@ -59,9 +75,7 @@ public class DroneContext extends Observable {
 
         setBatteryCapacity(decreasedBatteryLevel);
 
-        // Pass the droneId to the BatteryLevelObserver's constructor
-        BatteryLevelObserver batteryLevelObserver = new BatteryLevelObserver(getDroneId(), batteryLevelAuditLogger);
-
+        BatteryLevelObserver batteryLevelObserver = new BatteryLevelObserver(droneId);
         addObserver(batteryLevelObserver);
     }
 
@@ -92,7 +106,8 @@ public class DroneContext extends Observable {
     public void changeState(DroneState newState) {
         synchronized (this) {
             currentState = newState;
-            setChanged(); // Notify observers that the state has changed
+            setChanged();
+            notifyObservers();
         }
     }
 
@@ -100,13 +115,13 @@ public class DroneContext extends Observable {
         return currentState.getStateName();
     }
 
-   public void notifyObservers() {
-    synchronized (this) {
-        if (observers != null) {
-            for (Observer observer : observers) {
-                observer.update(this, this);
+    public void notifyObservers() {
+        synchronized (this) {
+            if (observers != null) {
+                for (Observer observer : observers) {
+                    observer.update(this, this);
+                }
             }
         }
     }
-}
 }

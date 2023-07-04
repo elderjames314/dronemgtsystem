@@ -18,7 +18,7 @@ import com.blusalt.dronemgtsystem.model.Drone;
  * monitoring mechanism that operates independently of the individual drone
  * states.
  */
-@Component
+
 public class BatteryLevelMonitor {
 
     private static final int CHECK_INTERVAL_SECONDS = 60;

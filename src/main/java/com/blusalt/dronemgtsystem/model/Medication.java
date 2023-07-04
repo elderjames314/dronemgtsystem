@@ -14,7 +14,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
 import lombok.Data;
 
 @Entity(name = "medications")
@@ -28,7 +28,7 @@ public class Medication {
     private String code;
     private String image;
 
-    @OneToMany(mappedBy = "medication")
+    @ManyToMany(mappedBy = "medications")
     private List<Delivery> deliveries;
 
     @CreationTimestamp
@@ -55,5 +55,6 @@ public class Medication {
             throw new InvalidRequestException("Invalid code. Only uppercase letters, underscore, and numbers are allowed.");
         }
     }
+
 
 }

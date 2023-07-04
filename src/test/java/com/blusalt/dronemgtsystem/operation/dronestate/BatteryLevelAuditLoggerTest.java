@@ -33,6 +33,7 @@ public class BatteryLevelAuditLoggerTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        batteryLevelAuditLogger = new BatteryLevelAuditLogger(droneRepository, batteryAuditRepository);
     }
 
     @Test

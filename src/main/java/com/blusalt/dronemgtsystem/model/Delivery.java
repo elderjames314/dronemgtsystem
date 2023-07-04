@@ -19,6 +19,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
@@ -35,9 +37,13 @@ public class Delivery {
     @JoinColumn(name = "drone_id")
     private Drone drone;
 
-    @ManyToOne
-    @JoinColumn(name = "medication_id")
-    private Medication medication;
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+        name = "delivery_medication",
+        joinColumns = @JoinColumn(name = "delivery_id"),
+        inverseJoinColumns = @JoinColumn(name = "medication_id")
+    )
+    private List<Medication> medications;
 
     @Column(name = "delivery_date")
     private LocalDateTime deliveryDate;

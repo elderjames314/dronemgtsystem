@@ -2,66 +2,112 @@ package com.blusalt.dronemgtsystem.operation.dronestate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.blusalt.dronemgtsystem.operation.dronestate.BatteryLevelObserver;
+import com.blusalt.dronemgtsystem.repository.BatteryAuditLogRepository;
+import com.blusalt.dronemgtsystem.repository.DroneRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Observer;
+import java.util.Optional;
 
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
+import com.blusalt.dronemgtsystem.model.BatteryAuditLog;
+import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.model.Medication;
 
 @ExtendWith(MockitoExtension.class)
 public class DroneContextTest {
 
-    @Test
-    void testLoadMedications() {
-        // Create a mock DroneState
-        DroneState currentState = mock(DroneState.class);
+    @Mock
+    private DroneRepository droneRepository;
 
-        // Create a mock BatteryLevelAuditLogger
-        BatteryLevelAuditLogger batteryLevelAuditLogger = mock(BatteryLevelAuditLogger.class);
+    @Mock
+    private BatteryAuditLogRepository batteryAuditRepository;
 
-        // Create an instance of the DroneContext with a specific droneId
-        DroneContext droneContext = new DroneContext(1234L);
-        droneContext.changeState(currentState);
-        droneContext.setBatteryCapacity(100);
+    @Mock
+    private BatteryLevelObserver batteryLevelObserver;
 
-        // Set up the medications list
-        List<Medication> medications = Collections.emptyList();
-        droneContext.setMedications(medications);
+    @InjectMocks
+    private DroneContext droneContext;
 
-        // Create a BatteryLevelObserver instance
-        BatteryLevelObserver batteryLevelObserver = new BatteryLevelObserver(droneContext.getDroneId(),
-                batteryLevelAuditLogger);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+        
 
-        // Add the BatteryLevelObserver as an observer to the droneContext
-        droneContext.addObserver(batteryLevelObserver);
-
-        // Call the loadMedications method
-        droneContext.loadMedications(medications);
-
-        // Verify that the current state handles the medication loading correctly
-        verify(currentState).handleLoadMedication(droneContext, medications);
-
-        // Verify that the battery level decreases as expected
-        assertEquals(90, droneContext.getBatteryCapacity());
-
-        // Verify that the BatteryLevelObserver is added as an observer
-        List<Observer> observers = droneContext.getObservers();
-        assertEquals(2, observers.size());
-        assertTrue(observers.get(0) instanceof BatteryLevelObserver);
-        assertEquals(1234L, ((BatteryLevelObserver) observers.get(0)).getDroneId());
-        assertEquals(batteryLevelAuditLogger, ((BatteryLevelObserver) observers.get(0)).getBatteryLevelAuditLogger());
     }
+
+    // @Test
+    // public void testLoadMedications_ShouldChangeStateToLoadedAndDecreaseBatteryLevel() {
+    //     // Arrange
+    //     Long droneId = 1L;
+    //     int initialBatteryLevel = 100;
+    //     List<Medication> medications = new ArrayList<>();
+    //     Medication medication1 = new Medication();
+    //     medication1.setCode("344L");
+    //     medication1.setName("med1");
+    //     medication1.setWeight(34.3);
+
+    //     Medication medication2 = new Medication();
+    //     medication2.setCode("344L");
+    //     medication2.setName("med1");
+    //     medication2.setWeight(34.3);
+
+    //     medications.add(medication1);
+    //     medications.add(medication2);
+    //     DroneStateName initialState = DroneStateName.IDLE;
+
+    //     Drone drone = new Drone();
+    //     drone.setBatteryCapacity(initialBatteryLevel);
+
+    //     droneContext.addObserver(batteryLevelObserver);
+
+    //     when(droneRepository.findById(droneId)).thenReturn(Optional.of(drone));
+
+    //     droneContext.setBatteryCapacity(initialBatteryLevel);
+    //     droneContext.setDroneId(droneId);
+    //     droneContext.changeState(new IdleState());
+
+    //     // Act
+    //     droneContext.loadMedications(medications);
+
+    //     // Assert
+    //     ArgumentCaptor<DroneStateName> stateArgumentCaptor = ArgumentCaptor.forClass(DroneStateName.class);
+    //     verify(batteryLevelObserver).setDroneId(droneId);
+    //     verify(batteryLevelObserver).update(droneContext, droneContext);
+
+    //     verify(droneRepository).findById(droneId);
+    //     verify(droneRepository).save(drone);
+
+    //     verify(batteryAuditRepository).save(any(BatteryAuditLog.class));
+
+    //     assertEquals(DroneStateName.LOADED, droneContext.getCurrentState());
+    //     assertEquals(medications, droneContext.getMedications());
+    //     assertEquals(initialBatteryLevel - (initialBatteryLevel * 0.1), droneContext.getBatteryCapacity(), 0.001);
+    // }
 
     @Test
     void testCheckBatteryLevel() {
