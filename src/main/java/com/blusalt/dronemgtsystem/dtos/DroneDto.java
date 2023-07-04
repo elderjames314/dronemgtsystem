@@ -28,7 +28,12 @@ public class DroneDto {
     }
 
     public DroneModel getModelPassed(String model) {
-        return DroneModel.valueOf(model);
+        try {
+             return DroneModel.valueOf(model.toUpperCase());
+        } catch (Exception e) {
+            throw new InvalidRequestException("Wrong value pass as model");
+        }
+       
     }
 
     private static void validateDroneModel(String model) {

@@ -146,7 +146,7 @@ public class DroneDtoTest {
         String modelString = "INVALID_MODEL";
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> droneDto.getModelPassed(modelString));
+        assertThrows(InvalidRequestException.class, () -> droneDto.getModelPassed(modelString));
     }
 
     @Test
@@ -155,6 +155,6 @@ public class DroneDtoTest {
         String modelString = null;
 
         // Act & Assert
-        assertThrows(NullPointerException.class, () -> droneDto.getModelPassed(modelString));
+        assertThrows(InvalidRequestException.class, () -> droneDto.getModelPassed(modelString));
     }
 }

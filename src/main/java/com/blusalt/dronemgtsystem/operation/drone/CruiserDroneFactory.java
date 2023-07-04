@@ -3,6 +3,7 @@ package com.blusalt.dronemgtsystem.operation.drone;
 import com.blusalt.dronemgtsystem.dtos.DroneDto;
 import com.blusalt.dronemgtsystem.enums.DroneModel;
 import com.blusalt.dronemgtsystem.model.Drone;
+import com.blusalt.dronemgtsystem.repository.DroneRepository;
 
 public class CruiserDroneFactory extends DroneBaseFactory {
 
