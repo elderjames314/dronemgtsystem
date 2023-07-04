@@ -2,9 +2,14 @@ package com.blusalt.dronemgtsystem.operation.dronestate;
 
 import java.util.List;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
 import com.blusalt.dronemgtsystem.model.Medication;
 
+@Component
+@Primary
 public class IdleState implements DroneState {
 
     @Override

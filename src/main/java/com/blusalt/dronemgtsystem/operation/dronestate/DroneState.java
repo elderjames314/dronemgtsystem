@@ -2,6 +2,8 @@ package com.blusalt.dronemgtsystem.operation.dronestate;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
 import com.blusalt.dronemgtsystem.model.Medication;
 

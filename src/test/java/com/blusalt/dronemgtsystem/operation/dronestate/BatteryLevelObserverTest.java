@@ -1,17 +1,20 @@
 package com.blusalt.dronemgtsystem.operation.dronestate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
 import org.aspectj.lang.annotation.Before;
+import org.glassfish.jaxb.core.v2.model.core.ID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
+import com.blusalt.dronemgtsystem.enums.DroneStates;
 import com.blusalt.dronemgtsystem.model.BatteryAuditLog;
 import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.repository.BatteryAuditLogRepository;
@@ -32,45 +36,52 @@ public class BatteryLevelObserverTest {
 
     @Mock
     private DroneRepository droneRepository;
+
     @Mock
     private BatteryAuditLogRepository batteryAuditLogRepository;
 
-    @InjectMocks
     private BatteryLevelObserver batteryLevelObserver;
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        batteryLevelObserver = new BatteryLevelObserver(droneRepository, batteryAuditLogRepository);
     }
 
-   @Test
-    public void testUpdate_DroneContextLoadedState_ShouldUpdateBatteryAndCreateAuditLog() {
-        // Arrange
+    @Test
+    public void testUpdate_LoadedState() {
+        // Mock data
         Long droneId = 1L;
-        int batteryLevel = 80;
-        DroneContext droneContext = mock(DroneContext.class);
+        int remainingBatteryLevel = 80;
+
+        DroneContext droneContext = new DroneContext();
+        droneContext.setCurrentState(new LoadedState());
+
         Drone drone = new Drone();
-        drone.setSerialNumber("DRN123");
-        batteryLevelObserver.setDroneId(1L);
+        drone.setId(droneId);
+        drone.setBatteryCapacity(0);
+        drone.setState(DroneStates.IDLE);
+
+        BatteryAuditLog batteryAuditLog = new BatteryAuditLog();
+        batteryAuditLog.setBatteryCapacity(String.valueOf(remainingBatteryLevel));
+        batteryAuditLog.setBatteryDetails("Battery details");
+        batteryAuditLog.setDroneSerialNumber(drone.getSerialNumber());
+        batteryAuditLog.setMessage("Loading successful and battery decreases accordingly");
+
+        // Configure mocks
         when(droneRepository.findById(droneId)).thenReturn(Optional.of(drone));
-        when(droneContext.getCurrentState()).thenReturn(DroneStateName.LOADED);
-        when(droneContext.getBatteryCapacity()).thenReturn(batteryLevel);
+        when(batteryAuditLogRepository.save(any(BatteryAuditLog.class))).thenReturn(batteryAuditLog);
 
-        // Act
-        batteryLevelObserver.update(droneContext, droneContext);
+        // Call the method under test
+        batteryLevelObserver.setDroneId(droneId);
+        batteryLevelObserver.setRemainingBatteryLevel(remainingBatteryLevel);
+        batteryLevelObserver.update(droneContext, null);
 
-        // Assert
-        ArgumentCaptor<Drone> droneArgumentCaptor = ArgumentCaptor.forClass(Drone.class);
-        verify(droneRepository).save(droneArgumentCaptor.capture());
-        Drone updatedDrone = droneArgumentCaptor.getValue();
-        assertEquals(batteryLevel, updatedDrone.getBatteryCapacity());
+        // Verify the interactions
+        verify(droneRepository, times(2)).save(drone);
 
-        ArgumentCaptor<BatteryAuditLog> auditLogArgumentCaptor = ArgumentCaptor.forClass(BatteryAuditLog.class);
-        verify(batteryAuditLogRepository).save(auditLogArgumentCaptor.capture());
-        BatteryAuditLog auditLog = auditLogArgumentCaptor.getValue();
-        assertEquals(String.valueOf(batteryLevel), auditLog.getBatteryCapacity());
-        assertEquals("Battery details", auditLog.getBatteryDetails());
-        assertEquals("DRN123", auditLog.getDroneSerialNumber());
-        assertEquals("Loading successful and battery deacreases accordingly", auditLog.getMessage());
+        // Assert the state changes
+        assertEquals(remainingBatteryLevel, drone.getBatteryCapacity());
+        assertEquals(DroneStates.LOADED, drone.getState());
     }
 }

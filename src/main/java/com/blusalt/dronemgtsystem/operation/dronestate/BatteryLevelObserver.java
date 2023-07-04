@@ -5,10 +5,10 @@ import java.util.Observer;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
+import com.blusalt.dronemgtsystem.enums.DroneStates;
 import com.blusalt.dronemgtsystem.model.BatteryAuditLog;
 import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.repository.BatteryAuditLogRepository;
@@ -25,17 +25,12 @@ import com.blusalt.dronemgtsystem.repository.DroneRepository;
 @RequiredArgsConstructor
 public class BatteryLevelObserver implements Observer {
 
-    @Autowired
-    private DroneRepository droneRepository;
-    
-    @Autowired
-    private BatteryAuditLogRepository BatteryAuditRepository;
+    private final DroneRepository droneRepository;
+
+    private final BatteryAuditLogRepository BatteryAuditRepository;
 
     private Long droneId;
-
-    public BatteryLevelObserver(Long droneId) {
-        this.droneId = droneId;
-    }
+    private int remainingBatteryLevel;
 
     public long getDroneId() {
         return droneId;
@@ -45,20 +40,28 @@ public class BatteryLevelObserver implements Observer {
         this.droneId = droneId;
     }
 
+    public void setRemainingBatteryLevel(int batteryLevel) {
+        this.remainingBatteryLevel = batteryLevel;
+    }
+
+    public int getRemainingBatteryLevel() {
+        return remainingBatteryLevel;
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof DroneContext) {
             DroneContext droneContext = (DroneContext) o;
-            if (droneContext.getCurrentState() == DroneStateName.LOADED) {
-                int batteryLevel = droneContext.getBatteryCapacity();
-                Optional<Drone> drone = droneRepository.findById(droneId);
-                if (drone.isPresent()) {
-                    drone.get().setBatteryCapacity(batteryLevel);
-                    droneRepository.save(drone.get());
+            Optional<Drone> drone = droneRepository.findById(droneId);
 
+            if (drone.isPresent()) {
+                if (droneContext.getCurrentState() == DroneStateName.LOADED) {
+                    drone.get().setBatteryCapacity(getRemainingBatteryLevel());
+                    drone.get().setState(DroneStates.valueOf(droneContext.getCurrentState().name()));
+                    droneRepository.save(drone.get());
                     // battery audit log
                     BatteryAuditLog batteryAuditLog = new BatteryAuditLog();
-                    batteryAuditLog.setBatteryCapacity(String.valueOf(batteryLevel));
+                    batteryAuditLog.setBatteryCapacity(String.valueOf(getRemainingBatteryLevel()));
                     batteryAuditLog.setBatteryDetails("Battery details");
                     batteryAuditLog.setDroneSerialNumber(drone.get().getSerialNumber());
                     batteryAuditLog.setMessage("Loading successful and battery deacreases accordingly");
@@ -67,7 +70,13 @@ public class BatteryLevelObserver implements Observer {
 
                 }
 
+                // update the drone for other states eg delivery etc
+                drone.get().setState(DroneStates.valueOf(droneContext.getCurrentState().name()));
+                droneRepository.save(drone.get());
             }
+
+            
+
         }
     }
 }

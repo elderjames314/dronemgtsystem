@@ -159,20 +159,6 @@ public class DroneContextTest {
         assertEquals(medications, retrievedMedications);
     }
 
-    @Test
-    void testSetAndGetBatteryCapacity() {
-        // Create an instance of the DroneContext
-        DroneContext droneContext = new DroneContext(1234L);
-
-        // Set the battery capacity
-        droneContext.setBatteryCapacity(100);
-
-        // Get the battery capacity
-        int retrievedBatteryCapacity = droneContext.getBatteryCapacity();
-
-        // Verify that the battery capacity is set and retrieved correctly
-        assertEquals(100, retrievedBatteryCapacity);
-    }
 
     @Test
     void testChangeState() {

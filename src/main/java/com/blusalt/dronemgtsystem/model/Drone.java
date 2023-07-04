@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.blusalt.dronemgtsystem.enums.DroneModel;
-import com.blusalt.dronemgtsystem.enums.DroneState;
+import com.blusalt.dronemgtsystem.enums.DroneStates;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -51,7 +51,7 @@ public class Drone {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "state")
-    private DroneState state = DroneState.IDLE;
+    private DroneStates state = DroneStates.IDLE;
 
     @OneToMany(mappedBy = "drone")
     private List<Delivery> deliveries;

@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,7 +27,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.blusalt.dronemgtsystem.dtos.DeliveryDto;
-import com.blusalt.dronemgtsystem.enums.DroneState;
+import com.blusalt.dronemgtsystem.enums.DroneStates;
 import com.blusalt.dronemgtsystem.exceptions.InvalidRequestException;
 import com.blusalt.dronemgtsystem.exceptions.NotFoundException;
 import com.blusalt.dronemgtsystem.model.Delivery;
@@ -71,7 +72,7 @@ public class DroneServiceTest {
 
         Drone drone = new Drone();
         drone.setId(1L);
-        drone.setState(DroneState.IDLE);
+        drone.setState(DroneStates.IDLE);
         drone.setWeightLimit(100);
         drone.setBatteryCapacity(50);
 
@@ -132,7 +133,7 @@ public class DroneServiceTest {
         deliveryDto.setMedicationIds(Collections.singletonList(1L));
 
         Drone drone = new Drone();
-        drone.setState(DroneState.DELIVERED);
+        drone.setState(DroneStates.DELIVERED);
 
         when(droneRepository.findById(1L)).thenReturn(java.util.Optional.of(drone));
 
@@ -154,7 +155,7 @@ public class DroneServiceTest {
 
         Drone drone = new Drone();
         drone.setId(1L);
-        drone.setState(DroneState.IDLE);
+        drone.setState(DroneStates.IDLE);
         drone.setWeightLimit(30);
 
         Medication medication1 = new Medication();
@@ -179,34 +180,6 @@ public class DroneServiceTest {
     }
 
     @Test
-    public void testGetLoadedMedicationsForDrone_DroneInLoadingState_ShouldReturnLoadedMedications() {
-        // Arrange
-        Long droneId = 1L;
-
-        // Mock the drone
-        Drone drone = new Drone();
-        drone.setId(droneId);
-        drone.setState(DroneState.LOADING);
-
-        // Mock the delivery and medications
-        Delivery delivery = new Delivery();
-        Medication medication1 = new Medication();
-        medication1.setId(101L);
-        Medication medication2 = new Medication();
-        medication2.setId(102L);
-        delivery.setMedications(Arrays.asList(medication1, medication2));
-        drone.setDeliveries(Collections.singletonList(delivery));
-
-        when(droneRepository.findById(droneId)).thenReturn(java.util.Optional.of(drone));
-
-        // Act
-        List<Medication> loadedMedications = droneService.getLoadedMedicationsForDrone(droneId);
-
-        // Assert
-        assertEquals(Arrays.asList(medication1, medication2), loadedMedications);
-    }
-
-    @Test
     public void testGetLoadedMedicationsForDrone_DroneNotInLoadingState_ShouldThrowInvalidRequestException() {
         // Arrange
         Long droneId = 1L;
@@ -214,7 +187,7 @@ public class DroneServiceTest {
         // Mock the drone
         Drone drone = new Drone();
         drone.setId(droneId);
-        drone.setState(DroneState.IDLE);
+        drone.setState(DroneStates.IDLE);
 
         when(droneRepository.findById(droneId)).thenReturn(java.util.Optional.of(drone));
 
@@ -223,22 +196,48 @@ public class DroneServiceTest {
     }
 
     @Test
-    public void testGetLoadedMedicationsForDrone_NoDeliveries_ShouldReturnEmptyList() {
-        // Arrange
+    public void testGetLoadedMedicationsForDrone_droneInLoadedState() {
+        // Create test objects
         Long droneId = 1L;
+        DroneRepository droneRepository = mock(DroneRepository.class);
+        DroneService droneService = new DroneService(droneRepository, null, null, null);
 
-        // Mock the drone
         Drone drone = new Drone();
-        drone.setId(droneId);
-        drone.setState(DroneState.LOADING);
+        drone.setState(DroneStates.LOADED);
 
-        when(droneRepository.findById(droneId)).thenReturn(java.util.Optional.of(drone));
+        Delivery delivery1 = new Delivery();
+        delivery1.setMedications(Collections.singletonList(new Medication()));
 
-        // Act
+        Delivery delivery2 = new Delivery();
+        delivery2.setMedications(Arrays.asList(new Medication(), new Medication()));
+
+        drone.setDeliveries(Arrays.asList(delivery1, delivery2));
+
+        // Set up the repository mock behavior
+        when(droneRepository.findById(droneId)).thenReturn(Optional.of(drone));
+
+        // Call the method under test
         List<Medication> loadedMedications = droneService.getLoadedMedicationsForDrone(droneId);
 
-        // Assert
-        assertTrue(loadedMedications.isEmpty());
+        // Verify the result
+        assertEquals(3, loadedMedications.size());
+    }
+
+    @Test
+    public void testGetLoadedMedicationsForDrone_droneNotInLoadedState() {
+        // Create test objects
+        Long droneId = 1L;
+        DroneRepository droneRepository = mock(DroneRepository.class);
+        DroneService droneService = new DroneService(droneRepository, null, null, null);
+
+        Drone drone = new Drone();
+        drone.setState(DroneStates.IDLE);
+
+        // Set up the repository mock behavior
+        when(droneRepository.findById(droneId)).thenReturn(Optional.of(drone));
+
+        // Call the method under test and verify that an exception is thrown
+        assertThrows(InvalidRequestException.class, () -> droneService.getLoadedMedicationsForDrone(droneId));
     }
 
     @Test
@@ -246,13 +245,13 @@ public class DroneServiceTest {
         // Arrange
         Drone drone1 = new Drone();
         drone1.setId(1L);
-        drone1.setState(DroneState.IDLE);
+        drone1.setState(DroneStates.IDLE);
 
         Drone drone2 = new Drone();
         drone2.setId(2L);
-        drone2.setState(DroneState.IDLE);
+        drone2.setState(DroneStates.IDLE);
 
-        when(droneRepository.findByState(DroneState.IDLE)).thenReturn(Arrays.asList(drone1, drone2));
+        when(droneRepository.findByState(DroneStates.IDLE.name())).thenReturn(Arrays.asList(drone1, drone2));
 
         // Act
         List<Drone> availableDrones = droneService.getAvailableDronesForLoading();
@@ -263,7 +262,7 @@ public class DroneServiceTest {
 
     @Test
     public void testGetAvailableDronesForLoading_NoDronesAvailable_ShouldReturnEmptyList() {
-        when(droneRepository.findByState(DroneState.IDLE)).thenReturn(Collections.emptyList());
+        when(droneRepository.findByState(DroneStates.IDLE.name())).thenReturn(Collections.emptyList());
 
         // Act
         List<Drone> availableDrones = droneService.getAvailableDronesForLoading();

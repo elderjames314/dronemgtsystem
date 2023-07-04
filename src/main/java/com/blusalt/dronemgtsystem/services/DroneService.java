@@ -6,18 +6,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.blusalt.dronemgtsystem.dtos.DeliveryDto;
-import com.blusalt.dronemgtsystem.enums.DroneState;
+import com.blusalt.dronemgtsystem.enums.DroneStates;
 import com.blusalt.dronemgtsystem.exceptions.InvalidRequestException;
 import com.blusalt.dronemgtsystem.exceptions.NotFoundException;
 import com.blusalt.dronemgtsystem.model.Delivery;
 import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.model.Medication;
-import com.blusalt.dronemgtsystem.operation.dronestate.BatteryLevelAuditLogger;
 import com.blusalt.dronemgtsystem.operation.dronestate.DroneContext;
+import com.blusalt.dronemgtsystem.operation.dronestate.DroneState;
 import com.blusalt.dronemgtsystem.repository.DeliveryRepository;
 import com.blusalt.dronemgtsystem.repository.DroneRepository;
 import com.blusalt.dronemgtsystem.repository.MedicationRepository;
@@ -51,8 +50,8 @@ public class DroneService {
 
     public List<Medication> getLoadedMedicationsForDrone(Long droneId) {
         Drone drone = getDroneById(droneId);
-        if (drone.getState() != DroneState.LOADING) {
-            throw new InvalidRequestException("Drone is not in LOADING state");
+        if (drone.getState() != DroneStates.LOADED) {
+            throw new InvalidRequestException("Drone is not in LOADED state");
         }
 
         List<Delivery> deliveries = drone.getDeliveries();
@@ -65,7 +64,7 @@ public class DroneService {
     }
 
     public List<Drone> getAvailableDronesForLoading() {
-        return droneRepository.findByState(DroneState.IDLE);
+        return droneRepository.findByState(DroneStates.IDLE.name());
     }
 
     public int getDroneBatteryLevel(Long droneId) {
@@ -85,7 +84,7 @@ public class DroneService {
     }
 
     private void validateDroneStateForLoading(Drone drone) {
-        if (!drone.getState().equals(DroneState.IDLE)) {
+        if (!drone.getState().equals(DroneStates.IDLE)) {
             throw new InvalidRequestException("Drone is not in IDLE state");
         }
     }

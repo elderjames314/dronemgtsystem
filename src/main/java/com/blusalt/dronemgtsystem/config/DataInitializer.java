@@ -1,7 +1,7 @@
 package com.blusalt.dronemgtsystem.config;
 
 import com.blusalt.dronemgtsystem.enums.DroneModel;
-import com.blusalt.dronemgtsystem.enums.DroneState;
+import com.blusalt.dronemgtsystem.enums.DroneStates;
 import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.model.Medication;
 import com.blusalt.dronemgtsystem.repository.DeliveryRepository;
@@ -35,7 +35,7 @@ public class DataInitializer implements CommandLineRunner {
             drone.setSerialNumber("Drone-" + i);
             drone.setModel(DroneModel.LIGHTWEIGHT);
             drone.setWeightLimit(10.0);
-            drone.setState(DroneState.IDLE);
+            drone.setState(DroneStates.IDLE);
             drone.setBatteryCapacity(100);
             droneRepository.save(drone);
         }

@@ -2,6 +2,7 @@ package com.blusalt.dronemgtsystem.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import com.blusalt.dronemgtsystem.dtos.CreatedDrone;
 import com.blusalt.dronemgtsystem.dtos.DeliveryDto;
 import com.blusalt.dronemgtsystem.dtos.DroneDto;
+import com.blusalt.dronemgtsystem.enums.DroneModel;
 import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.model.Medication;
 import com.blusalt.dronemgtsystem.operation.drone.DroneFactory;
@@ -44,43 +46,43 @@ public class DispatchControllerTest {
         dispatchController = new DispatchController(droneFactory, droneService);
     }
 
-    @Test
-    void testRegisterDrone() {
-        // Mock the droneDto
+   @Test
+    public void testRegisterDrone() {
+        // Mock data
         DroneDto droneDto = new DroneDto();
         droneDto.setModel("LIGHTWEIGHT");
-        droneDto.setSerialNumber("12345");
+        droneDto.setSerialNumber("DR123");
+        droneDto.setWeightLimit("2.5");
         droneDto.setBatteryCapacity(100);
-        droneDto.setWeightLimit("50");
 
-        // Mock the created drone
         Drone drone = new Drone();
         drone.setId(1L);
-        drone.setSerialNumber("12345");
+        drone.setSerialNumber("DR123");
         drone.setBatteryCapacity(100);
-        drone.setWeightLimit(50);
+        drone.setWeightLimit(2.5);
+        drone.setModel(DroneModel.LIGHTWEIGHT);
 
-        // Mock the drone factory
-        when(droneFactory.createLightweightDrone(droneDto)).thenReturn(drone);
+        CreatedDrone createdDrone = CreatedDrone.builder()
+                .id(drone.getId())
+                .serialNumber(drone.getSerialNumber())
+                .batteryCapacity(drone.getBatteryCapacity())
+                .weightLimit(drone.getWeightLimit())
+                .model(drone.getModel().name())
+                .build();
 
-        // Call the registerDrone method
+        // Configure mocks
+        when(droneFactory.createLightweightDrone(any(DroneDto.class))).thenReturn(drone);
+
+        // Call the method under test
         ResponseEntity<Response<CreatedDrone>> responseEntity = dispatchController.registerDrone(droneDto);
 
-        // Verify the response
-        assertNotNull(responseEntity);
-        assertEquals(200, responseEntity.getStatusCodeValue());
+        // Verify the interactions
+        verify(droneFactory).createLightweightDrone(droneDto);
 
-        Response<CreatedDrone> response = responseEntity.getBody();
-        assertNotNull(response);
-        // assertTrue(response.su());
-
-        CreatedDrone createdDrone = response.getData();
-        assertNotNull(createdDrone);
-        assertEquals(1L, createdDrone.getId());
-        assertEquals("12345", createdDrone.getSerialNumber());
-        assertEquals(100, createdDrone.getBatteryCapacity());
-        assertEquals(50, createdDrone.getWeightLimit());
-
+        // Assert the response
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Response<CreatedDrone> responseBody = responseEntity.getBody();
+        assertEquals(createdDrone, responseBody.getData());
     }
 
     @Test

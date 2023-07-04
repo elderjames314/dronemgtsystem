@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
+import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.model.Medication;
 import com.blusalt.dronemgtsystem.repository.BatteryAuditLogRepository;
 import com.blusalt.dronemgtsystem.repository.DroneRepository;
@@ -17,16 +20,27 @@ import com.blusalt.dronemgtsystem.repository.DroneRepository;
 @Component
 @RequiredArgsConstructor
 public class DroneContext extends Observable {
+    @Autowired
+    @Qualifier("idleState")
     private DroneState currentState;
     private List<Medication> medications;
     private int batteryCapacity;
     private Long droneId;
     private List<Observer> observers;
+    @Autowired
+    private BatteryLevelObserver batteryLevelObserver;
+    @Autowired
+    private DroneRepository droneRepository;
+    private Optional<Drone> drone;
 
 
     public DroneContext(Long droneId) {
         currentState = new IdleState();
         this.droneId = droneId;
+    }
+
+    public void setCurrentState(DroneState newState) {
+        this.currentState = newState;
     }
 
     public List<Observer> getObservers() {
@@ -68,14 +82,15 @@ public class DroneContext extends Observable {
 
 
     private void decreaseBatteryLevel() {
-        // Assumption: I decrease the battery level by 10% upon each loading....
+        // Assumption:  the battery level by 10% upon each loading....
         double decreasePercentage = 0.10;
         int currentBatteryLevel = getBatteryCapacity();
         int decreasedBatteryLevel = (int) (currentBatteryLevel - (currentBatteryLevel * decreasePercentage));
 
         setBatteryCapacity(decreasedBatteryLevel);
 
-        BatteryLevelObserver batteryLevelObserver = new BatteryLevelObserver(droneId);
+        batteryLevelObserver.setDroneId(getDroneId());
+        batteryLevelObserver.setRemainingBatteryLevel(decreasedBatteryLevel);
         addObserver(batteryLevelObserver);
     }
 
@@ -100,7 +115,12 @@ public class DroneContext extends Observable {
     }
 
     public int getBatteryCapacity() {
-        return batteryCapacity;
+        drone = droneRepository.findById(droneId);
+        if(drone.isPresent()) {
+            return drone.get().getBatteryCapacity();
+        }
+        return 1;
+        
     }
 
     public void changeState(DroneState newState) {

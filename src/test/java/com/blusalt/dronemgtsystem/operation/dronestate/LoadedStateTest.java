@@ -1,56 +1,91 @@
 package com.blusalt.dronemgtsystem.operation.dronestate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
+import com.blusalt.dronemgtsystem.model.Medication;
 
 public class LoadedStateTest {
     @Test
-    void testHandleBatteryCheck_BatteryLevelBelowThreshold() {
-        // Create an instance of the LoadedState
+    public void testHandleLoadMedication() {
+        // Create test objects
+        DroneContext context = mock(DroneContext.class);
+        List<Medication> medications = new ArrayList<>();
+
+        // Create LoadedState instance
         LoadedState loadedState = new LoadedState();
 
-        // Create an instance of the DroneContext with battery capacity below the
-        // threshold
-        DroneContext droneContext = new DroneContext(1234L);
-        droneContext.setBatteryCapacity(20);
+        // Call the method under test
+        loadedState.handleLoadMedication(context, medications);
 
-        // Call the handleBatteryCheck method
-        loadedState.handleBatteryCheck(droneContext);
+        // Verify that no action is performed in the Loaded state
+        verifyNoInteractions(context);
+    }
+
+    @Test
+    public void testHandleBatteryCheck_batteryCapacityLessThan25() {
+        // Create test objects
+        DroneContext context = mock(DroneContext.class);
+        LoadedState loadedState = new LoadedState();
+
+        // Set up the context
+        when(context.getBatteryCapacity()).thenReturn(20);
+
+        // Call the method under test
+        loadedState.handleBatteryCheck(context);
 
         // Verify that the state is changed to ReturningState
-        DroneStateName currentStateName = droneContext.getCurrentState();
-        assertEquals(DroneStateName.RETURNING, currentStateName);
+        verify(context).changeState(any(ReturningState.class));
     }
 
     @Test
-    void testHandleBatteryCheck_BatteryLevelAboveThreshold() {
-        // Create an instance of the LoadedState
+    public void testHandleBatteryCheck_batteryCapacityGreaterThan25() {
+        // Create test objects
+        DroneContext context = mock(DroneContext.class);
         LoadedState loadedState = new LoadedState();
 
-        // Create an instance of the DroneContext with battery capacity above the threshold
-        DroneContext droneContext = new DroneContext(1234L);
-        droneContext.setBatteryCapacity(30);
+        // Set up the context
+        when(context.getBatteryCapacity()).thenReturn(30);
 
-        // Call the handleBatteryCheck method
-        loadedState.handleBatteryCheck(droneContext);
+        // Call the method under test
+        loadedState.handleBatteryCheck(context);
 
         // Verify that the state is changed to DeliveringState
-        DroneStateName currentStateName = droneContext.getCurrentState();
-        assertEquals(DroneStateName.DELIVERING, currentStateName);
+        verify(context).changeState(any(DeliveringState.class));
     }
 
     @Test
-    void testGetStateName() {
-        // Create an instance of the LoadedState
+    public void testHandleReturn() {
+        // Create test objects
+        DroneContext context = mock(DroneContext.class);
         LoadedState loadedState = new LoadedState();
 
-        // Call the getStateName method
+        // Call the method under test
+        loadedState.handleReturn(context);
+
+        // Verify that no action is performed in the Loaded state
+        verifyNoInteractions(context);
+    }
+
+    @Test
+    public void testGetStateName() {
+        // Create LoadedState instance
+        LoadedState loadedState = new LoadedState();
+
+        // Call the method under test
         DroneStateName stateName = loadedState.getStateName();
 
-        // Verify that the state name is LOADED
+        // Verify the state name
         assertEquals(DroneStateName.LOADED, stateName);
     }
 }

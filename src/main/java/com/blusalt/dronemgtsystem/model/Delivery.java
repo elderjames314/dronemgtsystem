@@ -44,7 +44,7 @@ public class Delivery {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private DeliveryStatus status;
+    private DeliveryStatus status = DeliveryStatus.IN_TRANSIT;
 
     // Add mappedBy attribute to map the relationship
     @ManyToOne

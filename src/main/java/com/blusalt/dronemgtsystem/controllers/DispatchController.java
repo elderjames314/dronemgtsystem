@@ -9,7 +9,6 @@ import com.blusalt.dronemgtsystem.model.Drone;
 import com.blusalt.dronemgtsystem.model.Medication;
 import com.blusalt.dronemgtsystem.operation.drone.DroneFactory;
 import com.blusalt.dronemgtsystem.services.DroneService;
-import com.blusalt.dronemgtsystem.utils.DroneConstant;
 import com.blusalt.dronemgtsystem.utils.Response;
 
 import java.util.List;

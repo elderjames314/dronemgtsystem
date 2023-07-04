@@ -2,9 +2,12 @@ package com.blusalt.dronemgtsystem.operation.dronestate;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.blusalt.dronemgtsystem.enums.DroneStateName;
 import com.blusalt.dronemgtsystem.model.Medication;
 
+@Component
 public class DeliveringState implements DroneState {
     @Override
     public void handleLoadMedication(DroneContext context, List<Medication> medications) {
