@@ -51,6 +51,9 @@ The drone management system can be designed using a layered architecture, specif
 The layered architecture ensures separation of concerns and modularity, making the system easier to maintain and extend.
 
 
+
+### on start up the app, the application will create 10 drones and 50 medications to play with.
+
 # RUN the app with followings:
 
 ### RUN THE APP
