@@ -38,26 +38,24 @@ public class Delivery {
     private Drone drone;
 
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinTable(
-        name = "delivery_medication",
-        joinColumns = @JoinColumn(name = "delivery_id"),
-        inverseJoinColumns = @JoinColumn(name = "medication_id")
-    )
+    @JoinTable(name = "delivery_medication", joinColumns = @JoinColumn(name = "delivery_id"), inverseJoinColumns = @JoinColumn(name = "medication_id"))
     private List<Medication> medications;
-
-    @Column(name = "delivery_date")
-    private LocalDateTime deliveryDate;
-
-    @Column(name = "return_date")
-    private LocalDateTime returnDate;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private DeliveryStatus status;
 
-    @Column(name = "delivery_location")
-    private String deliveryLocation;
+    // Add mappedBy attribute to map the relationship
+    @ManyToOne
+    @JoinColumn(name = "medication_id")
+    private Medication medication;
+
+    @Column(name = "delivery_date")
+    private LocalDateTime deliveryDate;
+
+    @Column(name = "return_date")
+    private LocalDateTime returnDate;
 
     @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeliveryAuditLog> audits = new ArrayList<>();
@@ -66,7 +64,12 @@ public class Delivery {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(updatable = false)
     private LocalDateTime createdAt;
+
     @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+
+    private String deliveryLocation;
+
+    // Add getters and setters
 }

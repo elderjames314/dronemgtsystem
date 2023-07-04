@@ -3,6 +3,7 @@ package com.blusalt.dronemgtsystem.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -41,18 +42,16 @@ public class Drone {
     private DroneModel model;
 
     @NotNull
-    @Size(max=500)
     @Column(name = "weight_limit")
     private double weightLimit;
 
     @NotNull
-    @Size(max=100)
     private int batteryCapacity = 100;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "state")
-    private DroneState state;
+    private DroneState state = DroneState.IDLE;
 
     @OneToMany(mappedBy = "drone")
     private List<Delivery> deliveries;
@@ -66,7 +65,4 @@ public class Drone {
     private LocalDateTime updatedAt;
 
 
-    public void setDroneSerialNumber(String droneSerialNumber) {
-
-    }
 }

@@ -9,12 +9,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.blusalt.dronemgtsystem.exceptions.InvalidRequestException;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 @Entity(name = "medications")
@@ -28,7 +31,7 @@ public class Medication {
     private String code;
     private String image;
 
-    @ManyToMany(mappedBy = "medications")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "medication", cascade = CascadeType.ALL)
     private List<Delivery> deliveries;
 
     @CreationTimestamp
@@ -38,7 +41,6 @@ public class Medication {
     @UpdateTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
-
 
     public void setName(String name) {
         if (name.matches("^[a-zA-Z0-9\\-_]+$")) {
@@ -52,9 +54,9 @@ public class Medication {
         if (code.matches("^[A-Z_0-9]+$")) {
             this.code = code;
         } else {
-            throw new InvalidRequestException("Invalid code. Only uppercase letters, underscore, and numbers are allowed.");
+            throw new InvalidRequestException(
+                    "Invalid code. Only uppercase letters, underscore, and numbers are allowed.");
         }
     }
-
 
 }

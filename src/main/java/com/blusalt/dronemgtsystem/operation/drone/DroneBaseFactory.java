@@ -58,7 +58,7 @@ public class DroneBaseFactory implements DroneFactory {
     private Drone getDrone(DroneDto droneDto, DroneModel droneModel) {
         Drone drone = new Drone();
         drone.setBatteryCapacity(droneDto.getBatteryCapacity());
-        drone.setDroneSerialNumber(droneDto.getSerialNumber());
+        drone.setSerialNumber(droneDto.getSerialNumber());
         drone.setWeightLimit(Double.parseDouble(droneDto.getWeightLimit()));
         drone.setModel(droneModel);
         return saveDrone(drone);

@@ -94,6 +94,7 @@ public class DispatchController {
                 .serialNumber(drone.getSerialNumber())
                 .batteryCapacity(drone.getBatteryCapacity())
                 .weightLimit(drone.getWeightLimit())
+                .model(drone.getModel().name())
                 .build();
     }
 }

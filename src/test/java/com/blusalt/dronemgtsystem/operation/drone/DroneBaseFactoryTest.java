@@ -46,7 +46,7 @@ public class DroneBaseFactoryTest {
         mockedDrone = new Drone();
         mockedDrone.setId(1L);
         mockedDrone.setBatteryCapacity(100);
-        mockedDrone.setDroneSerialNumber("12345");
+        mockedDrone.setSerialNumber("12345");
         mockedDrone.setWeightLimit(50);
     }
 

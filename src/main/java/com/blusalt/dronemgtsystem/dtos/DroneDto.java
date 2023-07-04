@@ -63,7 +63,7 @@ public class DroneDto {
         try {
             double weight = Double.parseDouble(weightLimit);
             if (weight > 500) {
-                throw new InvalidRequestException("Weight limit cannot exceed 100");
+                throw new InvalidRequestException("Weight limit cannot exceed 500");
             }
         } catch (NumberFormatException e) {
             throw new InvalidRequestException("Please specify the correct weight limit as a numeric value");
