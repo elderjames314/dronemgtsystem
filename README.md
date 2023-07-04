@@ -49,3 +49,21 @@ The drone management system can be designed using a layered architecture, specif
 - Controller: The Controller component acts as an intermediary between the Model and View components. It receives user input from the View, performs necessary operations on the Model, and updates the View accordingly. It includes classes such as DroneController and MedicationController.
 
 The layered architecture ensures separation of concerns and modularity, making the system easier to maintain and extend.
+
+
+# RUN the app with followings:
+
+### RUN THE APP
+#### mvn spring-boot:run
+
+
+### RUN THE TESTS
+#### mvn test
+
+
+## POSTMAN DOC:
+
+https://documenter.getpostman.com/view/1702774/2s93zE3Kid
+
+
+
